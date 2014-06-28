@@ -16,6 +16,18 @@ def toTeX(s,bold=False):
     if bold: r='\\boldsymbol{'+r+'}'
     return r
 
+def toHTML(s,bold=False):
+    if s=='i': r= '\\to '
+    elif s=='k': r='\\wedge '
+    elif s=='d': r='\\vee '
+    elif s=='e': r='\\iff '
+    elif s=='n': r='\\neg '
+    elif s=='T': r='\\top '
+    elif s=='F': r='\\bot '
+    else: r=str(s)
+    if bold: r='\boldsymbol{'+r+'}'
+    return r
+
 def toTeXs(s,rem_out_p=True):
     s= ''.join([toTeX(a) for a in list(s)])
     if rem_out_p and s[0]=='(': s=s[1:-1]

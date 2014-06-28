@@ -2,7 +2,7 @@
 __author__ = 'dl'
 
 from nltk import Tree,parse_cfg,ShiftReduceParser
-from utils import toTeX,subtree_len,tree2str,all_subsets
+from utils import toTeX,subtree_len,tree2str,all_subsets,toHTML
 from reductio import reductio_do
 
 """ gramatika psf-a, izvan klase zbog brzine """
@@ -246,10 +246,61 @@ class Wff(Tree):
 
         return zag+'\n\r'+zag2
 
+    def reductio2HTML(self,rec,stepbystep=True):
+        f = self.__str__()
+        zag1 = '<table><th>'+''.join(['<td>\('+toHTML(a)+'\)</td>' for a in list(f)])+'</th>\n\r'
+        ra = rec[1]
+        rbrs = list(set([c[0] for c in ra]))
+
+        return zag1
+        # matrica
+        m=[]
+        for j in range(len(rbrs)):
+            l = []
+            for k in range(len(f)): l.append('')
+            m.append(l)
+        for i in ra:
+            m[rbrs.index(i[0])][i[2]-1] = '<td>'+('\('+toHTML('T')+'\)' if i[3]==True else '\('+toHTML('F')+'\)' if i[3]==False else 'x')+'</td>'
+
+        i=1
+        zag=zag1
+        for j in m:
+            zag=zag+'('+str(i)+')'
+            for k in j:
+                zag = zag + '<td>'+k+'</td>'
+            i+=1
+            zag= '<tr>'+zag+'</tr> \n'
+        zag += '\n</table>'
+
+        # sve u istom redu
+        m=[]
+        for j in range(0,2):
+            l = []
+            for k in range(len(f)): l.append('')
+            m.append(l)
+        for i in ra:
+            if i[3] in (True,False):
+                m[0][i[2]-1]= '\('+toHTML('T')+'\)' if i[3]==True else '\('+toHTML('F')+'\)'
+            else:
+                m[1][i[2]-1]='x'
+        i=1
+        zag2=zag1
+        for j in m:
+            zag2=zag2+'('+str(i)+')'
+            for k in j:
+                zag2 = zag2 + '<td>'+k+'</td>'
+            i+=1
+            zag2= '<tr>'+zag2+'</tr> \n'
+        zag2 += '\n</table>'
+
+        return zag+'\n\r'+zag2
 
 if __name__ == "__main__":
     # tests
     wff1 = Wff('((piq)i(nqinp))',wffs=True)
+    rec = wff1.reductio()
+    print(wff1.reductio2HTML(rec))
+    exit()
     print(wff1)
     print('Synthatic tree',wff1.treeTeX())
     print('evaluate',wff1.evaluate('p'))
